@@ -28,7 +28,7 @@ A PHP MVC Framework
 * 当然，你也可以只用其中任何几种
 
 #### Filter、Forward功能
-* Fitler和Forward是J2EE Servlet规范
+* Filter和Forward是J2EE Servlet规范
 * Zc框架提供了非常简洁、直观的使用方式
 
 #### Session管理
