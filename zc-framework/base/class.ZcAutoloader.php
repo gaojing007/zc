@@ -6,39 +6,60 @@
  *
  */
 class ZcAutoloader {
-	private $autoloadDirs = array();
-	private $autoloadClassFileMapping = array();
+	private static $autoloadDirs = array();
+	private static $autoloadClassFileMapping = array();
+	private static $includeFiles = array();
 	
-	public function __construct() {
+	private static function initConfig() {
 		$config = ZcFactory::getConfig();
 		
 		//获取绝对路径的自动加载目录
-		$dirsFs = $config->get('autoload.dirs.fs');
-		foreach($dirsFs as $dir) {
-			$this->autoloadDirs[] = rtrim(trim($dir), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;		
+		$dirsFs = $config->get(ZcConfigConst::AutoloadDirsFs);
+		if (!empty($dirsFs)) {
+			foreach($dirsFs as $dir) {
+				self::$autoloadDirs[] = rtrim(trim($dir), '/') . '/';		
+			}
 		}
 		
 		//获取应用路径的自动加载目录
-		$dirsWs = $config->get('autoload.dirs.ws');
-		$dirApp = $config->get('dir.fs.app');
-		foreach($dirsWs as $dir) {
-			$this->autoloadDirs[] = $dirApp . trim(trim($dir), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+		$dirsWs = $config->get(ZcConfigConst::AutoloadDirsWs);
+		$dirApp = $config->get(ZcConfigConst::DirFsApp);
+		if (!empty($dirsWs)) {
+			foreach($dirsWs as $dir) {
+				self::$autoloadDirs[] = $dirApp . trim(trim($dir), '/') . '/';
+			}
 		}
 		
-		$this->autoloadClassFileMapping = $config->get('autoload.class.file.mapping');
+		self::$autoloadClassFileMapping = $config->get(ZcConfigConst::AutoloadClassFileMapping);
+		
+		//自动加载文件
+		self::$includeFiles = $config->get(ZcConfigConst::AutoloadIncludeFiles);
 	}
 	
-	public function init() {
-		spl_autoload_register(array($this, "autoload"));
+	private static function includeFiles() {
+		if (empty(self::$includeFiles)) {
+			return ;
+		}
+		foreach(self::$includeFiles as $file) {
+			if (file_exists($file)) {
+				include_once $file;
+			}
+		}
 	}
 	
-	public function autoload($class) {
-		if (isset($this->autoloadClassFileMapping[$class])) {
-			include_once $this->autoloadClassFileMapping[$class];
+	public static function init() {
+		self::initConfig();
+		spl_autoload_register(array('ZcAutoloader', "autoload"));
+		self::includeFiles();
+	}
+	
+	public static function autoload($class) {
+		if (isset(self::$autoloadClassFileMapping[$class])) {
+			include_once self::$autoloadClassFileMapping[$class];
 			return ;
 		}
 		
-		foreach ($this->autoloadDirs as $autoLoadDir) {
+		foreach (self::$autoloadDirs as $autoLoadDir) {
 			$classFile = $autoLoadDir . 'class.' . $class . '.php';
 			if (file_exists($classFile)) {
 				include_once $classFile;

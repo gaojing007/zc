@@ -8,7 +8,7 @@ class ZcAction {
 	protected $args = array();
 
 	public function __construct($route, $args = array()) {
-		$dirController = Zc::C('dir.fs.libs.controller');
+		$dirController = Zc::C(ZcConfigConst::DirFsLibsController);
 
 		$this->route = $route;
 

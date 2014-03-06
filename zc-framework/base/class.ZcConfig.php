@@ -10,25 +10,99 @@ class ZcConfig {
 
 	public function __construct() {
 		$this->config = array (
-				'dir.fs.app' => '',
-				'language.default' => 'english',
-				'language.current' => 'chinese',
-				'url.handler' => array (
+				ZcConfigConst::DirFsApp => '',
+				ZcConfigConst::LanguageDefault => 'english',
+				ZcConfigConst::LanguageCurrent => 'chinese',
+				ZcConfigConst::UrlHandler => array (
 								'class' => 'ZcDefaultUrlHandler'
 								),
-				'default.route' => 'home/main/index',
-				'default.timezone' => 'Asia/Shanghai',
-				'clean.quotes' => true,
+				ZcConfigConst::DefaultRoute => 'home/main/index',
+				ZcConfigConst::DefaultTimezone => 'Asia/Shanghai',
+				ZcConfigConst::CleanQuotes => true,
 				
-				'monitor.autostart' => false,
-				'monitor.need.log.error.level.constants' => E_ALL & ~E_WARNING & ~E_NOTICE, 
-				'monitor.db.server' => '192.168.10.251',
-				'monitor.db.username' => 'tmart_db_dev',
-				'monitor.db.password' => 'tmart_db_dev',
-				'monitor.db.database' => 'tmart_hyl',
+				ZcConfigConst::MonitorAutostart => false,
+				ZcConfigConst::MonitorDbServer => '192.168.10.251',
+				ZcConfigConst::MonitorDbUsername => 'tmart_db_dev',
+				ZcConfigConst::MonitorDbPassword => 'tmart_db_dev',
+				ZcConfigConst::MonitorDbDatabase => 'tmart_dev',
+				ZcConfigConst::MonitorExitOnDbError => true,
 				
-				'log.dir' => '/tmp/zc/',
-				'log.level' => ZcLog::INFO,
+				ZcConfigConst::LogDir => '/tmp/zc/',
+				ZcConfigConst::LogLevel => ZcLog::INFO,
+                ZcConfigConst::LogHandlerLogstashredisEnable => true,
+				ZcConfigConst::LogHandlerLogstashredisHost => '192.168.0.2',
+				ZcConfigConst::LogHandlerLogstashredisPort => 6379,
+				ZcConfigConst::LogHandlerLogstashredisKey => 'logstash',
+				ZcConfigConst::DbConfig => array (
+						'db_cache' => array(
+									'biz_name' => 'zc_db_cache',
+									'cache_type' => 'memcached',
+									'timestamp' => '20130825',
+									'options' => array(array('host' => '192.168.0.2', 'port' => '11211')),
+								),
+						'tx_def' => array(
+									'isolation_level' => ZcTransactionDefinition::ISOLATION_READ_COMMITTED,
+									'propagation' => ZcTransactionDefinition::PROPAGATION_NESTED,
+								),
+						'error_mode' => 'bool', // bool or exception
+						'default_group' => 'zc',
+						'connections' => array (
+								'zc' => array (
+										'master' => array (
+												'db_id' => 'zc.master',
+												'dbms' => 'mysql',
+												'hostname' => 'localhost',
+												'port' => '3306',
+												'username' => 'root',
+												'password' => 'tmart123',
+												'pconnect' => false,
+												'charset' => 'utf8',
+												'database' => 'tmart',
+												'read_weight' => 0 
+										),
+										'slaves' => array (
+												array (
+														'db_id' => 'zc.slave1',
+														'dbms' => 'mysql',
+														'hostname' => 'localhost',
+														'port' => '3306',
+														'username' => 'root',
+														'password' => 'tmart123',
+														'pconnect' => false,
+														'charset' => 'utf8',
+														'database' => 'tmart',
+														'read_weight' => 30 
+												),
+												array (
+														'db_id' => 'zc.slave2',
+														'dbms' => 'mysql',
+														'hostname' => 'localhost',
+														'port' => '3306',
+														'username' => 'root',
+														'password' => 'tmart123',
+														'pconnect' => false,
+														'charset' => 'utf8',
+														'database' => 'tmart',
+														'read_weight' => 60 
+												) 
+										) 
+								),
+								'log' => array (
+										'master' => array (
+												'db_id' => 'log.master',
+												'dbms' => 'mysql',
+												'hostname' => '192.168.10.251',
+												'port' => '3306',
+												'username' => 'tmart_db_dev',
+												'password' => 'tmart_db_dev',
+												'pconnect' => false,
+												'charset' => 'utf8',
+												'database' => 'tmart_log',
+												//'read_weight' => 100 
+										) 
+								),
+						) 
+				),
 		);
 	}
 
@@ -43,7 +117,7 @@ class ZcConfig {
 		$this->config[$key] = $value;
 	}
 
-	public function get($key) {
-		return empty($key) ? $this->config : $this->config[$key];
+	public function get($key = '') {
+		return empty($key) ? $this->config : (isset($this->config[$key]) ? $this->config[$key] : null);
 	}
 }

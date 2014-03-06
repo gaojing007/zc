@@ -51,27 +51,15 @@ class ZcMonitor {
 	 */
 	static public function appError($errno, $errstr, $errfile, $errline) {
 		$needMonitor = ($errno != E_STRICT) && (($errno & ~E_WARNING & ~E_NOTICE) > 0);
-		$needLog = ($errno & Zc::C('monitor.need.log.error.level.constants')) > 0;
-		
-		//Zc::dump('needMonitor:' . $needMonitor);
-		//Zc::dump('needLog:' . $needLog);
 		
 		$errorStr = '';
-		if ($needMonitor || $needLog) {
+		if ($needMonitor) {
 			$errorStr =  "[$errno] [ZcMonitor::appError $errstr] [$errfile] [Line $errline].";
 		}
 		
 		//对于E_STRICT、E_WARNING、E_NOTICE不调用监控
 		if ($needMonitor) {
 			self::monitor($errorStr, $errno);
-		}
-		
-		//需要记Log
-		if ($needLog) {
-			if (!self::$log) {
-				self::$log = Zc::getLog();
-			}
-			self::$log->info($errorStr);
 		}
 	}
 

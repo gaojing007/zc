@@ -41,7 +41,7 @@ class ZcFactory {
 	 */
 	static function getLanguageObject() {
 		if (empty(self::$objectPool['language'])) {
-			self::$objectPool['language'] = new ZcLanguage(Zc::C('language.current'), Zc::C('language.default'));
+			self::$objectPool['language'] = new ZcLanguage(Zc::C(ZcConfigConst::LanguageCurrent), Zc::C(ZcConfigConst::LanguageDefault));
 		}
 		return self::$objectPool['language'];
 	}

@@ -11,10 +11,10 @@ class ZcUrl {
 	private $urlHandler = array();
 
 	public function __construct() {
-		$urlHandlerConfig = ZcFactory::getConfig()->get('url.handler');
+		$urlHandlerConfig = ZcFactory::getConfig()->get(ZcConfigConst::UrlHandler);
 		
 		if (!empty($urlHandlerConfig ['file'])) {
-			require_once (Zc::C('dir.fs.app') . $urlHandlerConfig ['file']);
+			require_once (Zc::C(ZcConfigConst::DirFsApp) . $urlHandlerConfig ['file']);
 		}
 		$this->urlHandler = new $urlHandlerConfig['class'];
 	}

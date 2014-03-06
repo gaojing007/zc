@@ -14,7 +14,7 @@ class ZcLanguage {
 	public function __construct($currentLanguage, $defaultLanguage) {
 		$this->currentLanguage = $currentLanguage;
 		$this->defaultLanguage = $defaultLanguage;
-		$this->baseDir = ZcFactory::getConfig()->get('dir.fs.app') . 'languages' . DIRECTORY_SEPARATOR;
+		$this->baseDir = ZcFactory::getConfig()->get(ZcConfigConst::DirFsApp) . 'languages/';
 	}
 
 	public function get($key) {

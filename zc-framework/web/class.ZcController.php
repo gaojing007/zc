@@ -40,7 +40,7 @@ class ZcController {
 		if (empty($view)) {
 			$view = $this->route;
 		}
-		return Zc::C('dir.fs.views.page') . $view . '.php';
+		return Zc::C(ZcConfigConst::DirFsViewsPage) . $view . '.php';
 	}
 
 	/**
@@ -50,7 +50,7 @@ class ZcController {
 		if (empty($view)) {
 			$view = $this->route;
 		}
-		$dirViewsLayout = Zc::C('dir.fs.views.layout');
+		$dirViewsLayout = Zc::C(ZcConfigConst::DirFsViewsLayout);
 
 		$layoutFiles = array();
 		$layoutFiles[] = $dirViewsLayout . 'default.php';
@@ -134,5 +134,14 @@ class ZcController {
 		} else {
 			echo $output;
 		}
+	}
+	
+	/**
+	 * 渲染输出json格式的内容
+	 * @param array $data
+	 */
+	protected function renderJSON($data) {
+		header('Content-type: text/json');
+		echo json_encode($data);
 	}
 }

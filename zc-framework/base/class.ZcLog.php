@@ -1,12 +1,17 @@
 <?php
 /**
  * 
- * Log对象的分装，提供自动递归创建log目录，日志分级等功能
+ * Log对象的分装，日志分级等功能
  * 
  * @author tangjianhui 2012-09-25 20:25:00
  *
  */
 class ZcLog {
+	// LogHandler
+	const LOG_HANDLER_DIR_FILE = 'ZcDirFileLogHandler';
+	const LOG_HANDLER_FLAT_FILE = 'ZcFlatFileLogHandler';
+	const LOG_HANDLER_LOGSTASH_REDIS = 'ZcLogstashRedisLogHandler';
+	
 	// 日志级别 从上到下，由低到高
 	const SQL       = 1;  // SQL：SQL语句 注意只在调试模式开启时有效
 	const DEBUG   = 2;  // 调试: 调试信息
@@ -18,42 +23,31 @@ class ZcLog {
 	const ALERT    = 8;  // 警戒性错误: 必须被立即修改的错误
 	const EMERG   = 9;  // 严重错误: 导致系统崩溃无法使用
 
-	private $logPath = './';
-	private $defaultLevel = self::INFO;
-	private $echo = false;
 	private $tags = array(1 => 'SQL', 2 => 'DEBUG', 3 => 'INFO', 4 => 'NOTICE', 5 => 'WARN', 6 => 'ERR', 7 => 'CRIT', 8 => 'ALERT', 9 => 'EMERG');
 	
 	// 日期格式
-	private $format =  '[ c ]';
-
+	private $format =  '[c]';
 	
-	function __construct($logPath, $defaultLevel = ZcLog::INFO, $echo = false) {
-		$this->init($logPath, $defaultLevel, $echo);
-	}
+	/**
+	 * @var ZcLogHandler
+	 */
+	private $logHandler;
 	
-	public function init($logPath = '', $defaultLevel = ZcLog::INFO, $echo = false) {
-		if (empty($logPath)) {
-			$logPath = dirname(__FILE__) . '/zc.log';
-		}
-		$logDir = dirname($logPath);
-		$this->mkdir($logDir);
+	// 默认LogLevel
+	private $defaultLevel;
+	
+	// 是否直接输出
+	private $echo;
+	
+	public function __construct($logName = '', $defaultLevel = ZcLog::INFO, $echo = false, $logHandler = ZcLog::LOG_HANDLER_DIR_FILE, $options = array()) {
 		
-		$this->logPath = $logPath;
+		$this->logHandler = new $logHandler($logName, $options);
 		$this->defaultLevel = $defaultLevel;
+		
 		$this->echo = false;
 		if (defined('G_RUNTIME_MODE') && G_RUNTIME_MODE == 'dev') {
 			$this->echo = $echo;
 		}
-	}
-	
-	/**
-	 * 递归创建目录
-	 * 
-	 * @param unknown_type $logPath
-	 * @param unknown_type $chmod
-	 */
-	private function mkdir($logPath, $chmod = 0777) {
-		return is_dir($logPath) || ($this->mkdir(dirname($logPath),$chmod) && mkdir($logPath, $chmod));
 	}
 	
 	/**
@@ -70,12 +64,12 @@ class ZcLog {
 		if (!is_string($message)) {
 			$message = "\r\n" . print_r($message, true);
 		}
-		
+
 		if ($level >= $this->defaultLevel) {
-			error_log("{$client_ip} {$now} {$levelTag}: {$message}\r\n", 3, $this->logPath);
+			$this->logHandler->log("{$now} {$client_ip} {$levelTag}: {$message}\r\n");
 		}
 		if ($this->echo) {
-			echo "{$client_ip} {$now} {$levelTag}: {$message} <br />";
+			echo "{$now} {$client_ip} {$levelTag}: {$message} <br />";
 		}
 	}
 

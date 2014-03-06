@@ -36,7 +36,7 @@ abstract class ZcWidget {
 			extract($renderData, EXTR_OVERWRITE);
 		}
 
-		$widgetFile = Zc::C('dir.fs.views.widget') . $templateFile . '.php';
+		$widgetFile = Zc::C(ZcConfigConst::DirFsViewsWidget) . $templateFile . '.php';
 		if( file_exists($widgetFile) ) {
 			include ($widgetFile);
 		}

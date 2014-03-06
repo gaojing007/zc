@@ -8,7 +8,7 @@ class ZcDispatcher {
 	 */
 	public function dispatch($action, $error  = null) {
 		//处理过滤器，放在这个位置，说明只对类似Servlet规范的Request处理起作用
-		$filters = ZcFactory::getConfig()->get('filters');
+		$filters = ZcFactory::getConfig()->get(ZcConfigConst::Filters);
 		if (!empty($filters)) {
 			$matchFilterRoutes = array();
 			foreach ($filters as $filter) {

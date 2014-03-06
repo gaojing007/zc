@@ -6,13 +6,23 @@
  *
  */
 class Zc {
+	// Zc框架文件所在的根目录
+	private static $zcFrameworkFsRootDir;
+	
+	private static $importFiles = array();
+	
+	// Zc框架本身的初始化是否已经完成
 	private static $isZcFrameworkAutoload = false;
 	
+	// Zc内部类
 	private static $zcClassMapping = array();
 	
-	private static function zcFrameworkAutoloader($class) {
-		if (isset(self::$zcClassMapping[$class]) && file_exists(self::$zcClassMapping[$class])) {
-			require_once self::$zcClassMapping[$class];
+	public static function zcFrameworkAutoloader($class) {
+		if (isset(self::$zcClassMapping[$class])) {
+			$file = self::$zcFrameworkFsRootDir . self::$zcClassMapping[$class];
+			if (file_exists($file)) {
+				require_once $file;
+			}
 		}
 	}
 	
@@ -24,48 +34,60 @@ class Zc {
 			return ;
 		}
 		
-		$zcFsDir = dirname(__FILE__) . DIRECTORY_SEPARATOR;
-		$zcBaseFsDir = $zcFsDir . 'base' . DIRECTORY_SEPARATOR;
-		$zcCacheFsDir = $zcFsDir . 'cache' . DIRECTORY_SEPARATOR;
-		$zcDbFsDir = $zcFsDir . 'db' . DIRECTORY_SEPARATOR;
-		$zcMonitorFsDir = $zcFsDir . 'monitor' . DIRECTORY_SEPARATOR;
-		$zcWebFsDir =  $zcFsDir . 'web' . DIRECTORY_SEPARATOR;
-		$zcWebUrlHandlersFsDir =  $zcFsDir . 'web' . DIRECTORY_SEPARATOR . 'url-handlers' . DIRECTORY_SEPARATOR;
-		$zcWebSessionHandlersFsDir =  $zcFsDir . 'web' . DIRECTORY_SEPARATOR . 'session-handlers' . DIRECTORY_SEPARATOR;
-		
+		self::$zcFrameworkFsRootDir = dirname(__FILE__) . '/';
+				
 		self::$zcClassMapping = array(
-				'ZcAutoloader' => $zcBaseFsDir . 'class.ZcAutoloader.php',
-				'ZcConfig' => $zcBaseFsDir . 'class.ZcConfig.php',
-				'ZcFactory' => $zcBaseFsDir . 'class.ZcFactory.php',
-				'ZcLanguage' => $zcBaseFsDir . 'class.ZcLanguage.php',
-				'ZcLog' => $zcBaseFsDir . 'class.ZcLog.php',
+				'ZcNumberHelper' => 'helpers/class.ZcNumberHelper.php', 
+				'ZcStringHelper' => 'helpers/class.ZcStringHelper.php',
 				
-				'ZcAbstractCache' => $zcCacheFsDir . 'class.ZcAbstractCache.php',
-				'ZcCacheApc' => $zcCacheFsDir . 'class.ZcCacheApc.php',
-				'ZcCacheDebug' => $zcCacheFsDir . 'class.ZcCacheDebug.php',
-				'ZcCacheFile' => $zcCacheFsDir . 'class.ZcCacheFile.php',
-				'ZcCacheMemcached' => $zcCacheFsDir . 'class.ZcCacheMemcached.php',
+				'ZcConfigConst' => 'base/class.ZcConfigConst.php',
+				'ZcAutoloader' => 'base/class.ZcAutoloader.php',
+				'ZcConfig' => 'base/class.ZcConfig.php',
+				'ZcFactory' => 'base/class.ZcFactory.php',
+				'ZcLanguage' => 'base/class.ZcLanguage.php',
+				'ZcLog' => 'base/class.ZcLog.php',
+				'ZcLogHandler' => 'base/class.ZcLogHandler.php',
+				'ZcDirFileLogHandler' => 'base/log-handlers/class.ZcDirFileLogHandler.php',
+				'ZcFlatFileLogHandler' => 'base/log-handlers/class.ZcFlatFileLogHandler.php',
+				'ZcLogstashRedisLogHandler' => 'base/log-handlers/class.ZcLogstashRedisLogHandler.php',
 				
-				'ZcDbSimpleMysql' => $zcDbFsDir . 'class.ZcDbSimpleMysql.php',
+				'ZcAbstractCache' => 'cache/class.ZcAbstractCache.php',
+				'ZcCacheApc' => 'cache/class.ZcCacheApc.php',
+				'ZcCacheDebug' => 'cache/class.ZcCacheDebug.php',
+				'ZcCacheFile' => 'cache/class.ZcCacheFile.php',
+				'ZcCacheMemcached' => 'cache/class.ZcCacheMemcached.php',
 				
-				'ZcMonitor' => $zcMonitorFsDir . 'class.ZcMonitor.php',
-				'ZcMonitorHandler' => $zcMonitorFsDir . 'class.ZcMonitorHandler.php',
+				'ZcDb' => 'db/class.ZcDb.php',
+				'ZcDbConnection' => 'db/class.ZcDbConnection.php',
+				'ZcSqlBuilder' => 'db/class.ZcSqlBuilder.php',
+				'ZcDbSimpleMysql' => 'db/class.ZcDbSimpleMysql.php',
+				'ZcDbEval' => 'db/class.ZcDbEval.php',
+				'ZcDbListener' => 'db/class.ZcDbListener.php',
+				'ZcDbDefaultListener' => 'db/class.ZcDbDefaultListener.php',
+				'ZcMysqlDbConnection' => 'db/drivers/class.ZcMysqlDbConnection.php',
+				'ZcTransactionDefinition' => 'db/transaction/class.ZcTransactionDefinition.php',
+				'ZcTransactionStatus' => 'db/transaction/class.ZcTransactionStatus.php',
+				'ZcDbException' => 'db/exceptions/class.ZcDbException.php',
+				'ZcDbConnectionException' => 'db/exceptions/class.ZcDbConnectionException.php',
 				
-				'ZcAction' => $zcWebFsDir . 'class.ZcAction.php',
-				'ZcController' => $zcWebFsDir . 'class.ZcController.php',
-				'ZcDispatcher' => $zcWebFsDir . 'class.ZcDispatcher.php',
-				'ZcSession' => $zcWebFsDir . 'class.ZcSession.php',
-				'ZcSessionHandler' => $zcWebFsDir . 'class.ZcSessionHandler.php',
-				'ZcUrl' => $zcWebFsDir . 'class.ZcUrl.php',
-				'ZcUrlHandler' => $zcWebFsDir . 'class.ZcUrlHandler.php',
-				'ZcWidget' => $zcWebFsDir . 'class.ZcWidget.php',
+				'ZcMonitor' => 'monitor/class.ZcMonitor.php',
+				'ZcMonitorHandler' => 'monitor/class.ZcMonitorHandler.php',
 				
-				'ZcDefaultUrlHandler' => $zcWebUrlHandlersFsDir . 'class.ZcDefaultUrlHandler.php',
-				'ZcSimplePathInfoUrlHandler' => $zcWebUrlHandlersFsDir . 'class.ZcSimplePathInfoUrlHandler.php',
-				'ZcSimpleRewriteUrlHandler' => $zcWebUrlHandlersFsDir . 'class.ZcSimpleRewriteUrlHandler.php',
+				'ZcAction' => 'web/class.ZcAction.php',
+				'ZcController' => 'web/class.ZcController.php',
+				'ZcDispatcher' => 'web/class.ZcDispatcher.php',
+				'ZcSession' => 'web/class.ZcSession.php',
+				'ZcSessionHandler' => 'web/class.ZcSessionHandler.php',
+				'ZcUrl' => 'web/class.ZcUrl.php',
+				'ZcUrlHandler' => 'web/class.ZcUrlHandler.php',
+				'ZcWidget' => 'web/class.ZcWidget.php',
 				
-				'ZcDbSessionHandler' => $zcWebSessionHandlersFsDir . 'class.ZcDbSessionHandler.php',
-				'ZcMemcachedSessionHandler' => $zcWebSessionHandlersFsDir . 'class.ZcMemcachedSessionHandler.php',
+				'ZcDefaultUrlHandler' => 'web/url-handlers/class.ZcDefaultUrlHandler.php',
+				'ZcSimplePathInfoUrlHandler' => 'web/url-handlers/class.ZcSimplePathInfoUrlHandler.php',
+				'ZcSimpleRewriteUrlHandler' => 'web/url-handlers/class.ZcSimpleRewriteUrlHandler.php',
+				
+				'ZcDbSessionHandler' => 'web/session-handlers/class.ZcDbSessionHandler.php',
+				'ZcMemcachedSessionHandler' => 'web/session-handlers/class.ZcMemcachedSessionHandler.php',
 				);
 		
 		spl_autoload_register(array('Zc', 'zcFrameworkAutoloader'));
@@ -74,51 +96,111 @@ class Zc {
 	}
 	
 	/**
+	 * 手动加载文件
+	 * 
+	 * @param string $class
+	 * @param string $baseUrl
+	 * @param string $ext
+	 * @param string $prefix
+	 * @return multitype:
+	 */
+	public static function import($class, $baseUrl = '', $ext='.php', $prefix = '') {
+		$class = str_replace(array('.', '#'), array('/', '.'), $class);
+
+		// 如果是zc自带的类
+		if (empty($baseUrl) && false === strpos($class, '/')) {
+			return isset(self::$zcClassMapping[$class]);
+		}
+			
+		$classStrut = explode('/', $class);
+		$realClass = array_pop($classStrut);  //最后一个是类名或文件名
+		if (empty($baseUrl)) {
+			$dirAlias = array_shift($classStrut); //第一个是目录别名
+			if ('@' == $dirAlias) {
+				//加载当前项目应用类库
+				$baseUrl = Zc::C(ZcConfigConst::DirFsLibs);
+			} elseif ('zc' == $dirAlias) { 
+				// zc 官方基类库
+				$baseUrl = self::$zcFrameworkFsRootDir;
+			} 
+		}
+		if (substr($baseUrl, -1) != '/') {
+			$baseUrl .= '/';
+		}
+		if (count($classStrut) > 0) {
+			$baseUrl .= implode('/', $classStrut) . '/';
+		}
+		
+		if ($realClass === '*' && (($currDir = dir($baseUrl)) !== false)) {
+			while(($currFile = $currDir->read()) !== false) {
+				if (preg_match("/{$ext}$/", $currFile) > 0) {
+					$classfile = $baseUrl . $currFile;
+					self::requireCache($classfile);
+				}
+			}
+			$currDir->close();
+		} else {
+			$classfile = $baseUrl . $prefix . $realClass . $ext;
+			if (!class_exists(basename($realClass), false)) {
+				// 如果类不存在 则导入类库文件
+				return self::requireCache($classfile);
+			}
+		}
+	}
+	
+	private static function requireCache($filename) {
+		if (!isset(self::$importFiles[$filename])) {
+			if (file_exists($filename)) {
+				require $filename;
+				self::$importFiles[$filename] = true;
+			} else {
+				self::$importFiles[$filename] = false;
+			}
+		}
+		return self::$importFiles[$filename];
+	}
+	
+	/**
 	 * 初始化系统配置。
 	 * *fs* = Filesystem directories (local/physical)。绝对路径的目录
 	 * *ws* = Webserver directories (virtual/URL)。相对于应用的目录
 	 *  
-	 * @param string $rootDir 系统根目录，比如/home/www/
+	 * @param string $rootFsDir 系统根目录，比如/home/www/
 	 * @param string $appDir mvc代码相对于系统根目录的位置 比如 front_app/
 	 */
-	private static function initConfig($rootDir, $appDir) {
+	private static function initConfig($rootFsDir, $appDir) {
 		$config = ZcFactory::getConfig();
 		
-		$rootDir = rtrim($rootDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		if ($appDir == DIRECTORY_SEPARATOR) {
-			$appDir =  '';
-		} else {
-			$appDir = rtrim($appDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-		}
+		$rootFsDir = rtrim($rootFsDir, '/') . '/';
+		$appDir = ($appDir === '/') ? '' : rtrim($appDir, '/') . '/';
 		
-		$appFsDir = $rootDir . $appDir;
+		$appFsDir = $rootFsDir . $appDir;
 		
-		$config->set('dir.fs.root', $rootDir);
-		$config->set('dir.fs.app', $appFsDir);
-		$config->set('dir.fs.conf', $appFsDir . 'conf' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.languages', $appFsDir . 'languages' . DIRECTORY_SEPARATOR);
+		$config->set(ZcConfigConst::DirFsRoot, $rootFsDir);
+		$config->set(ZcConfigConst::DirFsApp, $appFsDir);
+		$config->set(ZcConfigConst::DirFsConf, $appFsDir . 'conf/');
+		$config->set(ZcConfigConst::DirFsLanguages, $appFsDir . 'languages/');
 		
-		$config->set('dir.fs.views.layout', $appFsDir . 'views' . DIRECTORY_SEPARATOR . 'layout' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.views.page', $appFsDir . 'views' . DIRECTORY_SEPARATOR . 'page' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.views.widget', $appFsDir . 'views' . DIRECTORY_SEPARATOR . 'widget' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.views.static', $appFsDir . 'views' . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR);
-		$config->set('dir.ws.views.static', $appDir . 'views' . DIRECTORY_SEPARATOR . 'static' . DIRECTORY_SEPARATOR);
+		$config->set(ZcConfigConst::DirFsViewsLayout, $appFsDir . 'views/layout/');
+		$config->set(ZcConfigConst::DirFsViewsPage, $appFsDir . 'views/page/');
+		$config->set(ZcConfigConst::DirFsViewsWidget, $appFsDir . 'views/widget/');
+		$config->set(ZcConfigConst::DirWsViewsStatic, $appDir . 'views/static/');
 		
-		$config->set('dir.fs.libs', $appFsDir . 'libs' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.libs.controller', $appFsDir . 'libs' . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR);
-		$config->set('dir.fs.libs.widget', $appFsDir . 'libs' . DIRECTORY_SEPARATOR . 'widget' . DIRECTORY_SEPARATOR);
+		$config->set(ZcConfigConst::DirFsLibs, $appFsDir . 'libs/');
+		$config->set(ZcConfigConst::DirFsLibsController, $appFsDir . 'libs/controller/');
+		$config->set(ZcConfigConst::DirFsLibsWidget, $appFsDir . 'libs/widget/');
 		
-		$config->set('dir.ws.app', $appDir);
+		$config->set(ZcConfigConst::DirWsApp, $appDir);
 		
 		//language
-		$config->set('language.default', 'english');
-		$config->set('language.current', 'chinese');
+		$config->set(ZcConfigConst::LanguageDefault, 'english');
+		$config->set(ZcConfigConst::LanguageCurrent, 'chinese');
 		
-		$config->mergeFromFile($config->get('dir.fs.conf') . 'conf.php');
+		$config->mergeFromFile($config->get(ZcConfigConst::DirFsConf) . 'conf.php');
 	}
 	
 	private static function initMonitor() {
-		$isAutoStart = ZcFactory::getConfig()->get('monitor.autostart');
+		$isAutoStart = ZcFactory::getConfig()->get(ZcConfigConst::MonitorAutostart);
 		if (!$isAutoStart) {
 			return ;
 		}
@@ -132,24 +214,22 @@ class Zc {
 		set_exception_handler(array('ZcMonitor','appException'));
 	}
 	
-	public static function init($rootDir, $appDir = DIRECTORY_SEPARATOR) {
+	public static function init($rootFsDir, $appDir = '/') {
 		
 		// 初始化Zc框架内部类的自动加载机制
 		self::initZcFrameworkAutoloader();
 		
 		// 初始化配置
-		self::initConfig($rootDir, $appDir);
+		self::initConfig($rootFsDir, $appDir);
 		
 		// 初始化默认时区
-		self::initTimeZone();
+		self::initTimezone();
 		
 		// 初始化监控
 		self::initMonitor();
 		
 		// 应用类的自动加载
-		$autoloader = new ZcAutoloader();
-		$autoloader->init();
-		//Zc::dump($autoloader);
+		ZcAutoloader::init();
 	}
 	
     public static function dump($var, $strict=true, $echo=true, $label=null) {
@@ -190,15 +270,13 @@ class Zc {
 	
 		$lastPart = array_pop($parts);
 		$className = str_replace(' ', '', ucwords(strtolower(str_replace(array('-', '_'), ' ', $lastPart)))) . 'Widget';
-	
 		$path = '';
 		foreach ($parts as $part) {
 			$path .= $part . '/';
 		}
 		//加载语言
 		ZcFactory::getLanguageObject()->loadWidgetLanguageByRoute($route);
-		
-		require_once (Zc::C('dir.fs.libs.widget') . $path . 'class.' . $className . '.php');
+		require_once (Zc::C(ZcConfigConst::DirFsLibsWidget) . $path . 'class.' . $className . '.php');
 		$widget = new $className();
 		$content = $widget->render($data);
 		if ($return)
@@ -211,12 +289,53 @@ class Zc {
 	 * 获取某个语言常量
 	 * @param string $key
 	 */
-	public static function L($key) {
+	public static function L($key) { 
 		return ZcFactory::getLanguageObject()->get($key);
 	}
 	
-	public static function C($key = '') {
-		return ZcFactory::getConfig()->get($key);
+	/**
+	 * 得到DB操作类
+	 * 
+	 * @return ZcDb
+	 */
+	public static function getDb() {
+		return ZcFactory::singleton('ZcDb');
+	}
+	
+	/**
+	 * 引用某个语言文件
+	 * @param file 绝对路径文件名称
+	 * @param lang 语言类型 默认是<b>english</b>
+	 * @param string $key
+	 */
+	public static function loadLanguageFile($file, $lang = 'english') {
+		return ZcFactory::getLanguageObject()->loadByFile($file, $lang);
+	}
+	
+	/**
+	 * 如果$key为空，返回所有配置；
+	 * 如果$key不为空，$value为空，返回$key的值
+	 * 如果$key, $value都不为空，设置属性
+	 * 
+	 * @param String $key
+	 * @param String $value
+	 * @return String|Array|null
+	 */
+	public static function C($key = null, $value = null) {
+		$config = ZcFactory::getConfig();
+		
+		if (empty($key)) {
+			return $config->get();
+		}
+		
+		if (is_string($key)) {
+			if (is_null($value)) {
+				return $config->get($key);
+			} else {
+				$config->set($key, $value);
+			}
+		}
+		return null;
 	}
 	
 	public static function url($route, $param, $ssl = false) {
@@ -225,11 +344,6 @@ class Zc {
 	
 	public static function singleton($className) {
 		return ZcFactory::singleton($className);
-	}
-	
-	private static function my_microtime_float($dec = 3) {
-		list($usec, $sec) = explode(" ", microtime());
-		return bcadd($usec, $sec, $dec);
 	}
 	
 	//记录和统计时间（微妙）
@@ -245,11 +359,11 @@ class Zc {
 			$info[$start] = $end;
 		} elseif (!empty($end)) {
 			if (!isset($_info[$end])) {
-				$_info[$end] = my_microtime_float($dec);
+				$_info[$end] = ZcNumberHelper::microtimeFloat(3);
 			}
 			return number_format($_info[$end] - $_info[$start], $dec);
 		} elseif (!empty($start)) {
-			$_info[$start] = my_microtime_float($dec);
+			$_info[$start] = ZcNumberHelper::microtimeFloat(3);
 		} else {
 			$temp = array();
 	
@@ -290,27 +404,16 @@ class Zc {
 	 *
 	 * 比如调用Zc::getLog('ds/register');那么日志的位置是：Zc::C{log.dir}/ds/register.log.2012_02_12
 	 *
-	 * @param $logName log名字
+	 * @param $logName Log Name
 	 * @param $defaultLevel 定义在Log的常量，只有高于默认log级别的log，才会被记录下来
 	 * @param $echo 是否输出，如果设置为true，那么当记log的时候，同时会echo到页面中。仅供不懂得用tail -f查看log的懒人调试用，并用于开发环境
+	 * @param $logHandler logHandler
+	 * @param $options 生成LogHandler的条件
+	 * 
 	 * @return ZcLog
 	 */
-	public static function getLog($logName = '', $defaultLevel = ZcLog::INFO, $echo = false) {
-		$logName = trim($logName);
-		
-		if (empty($logName)) {
-			$logName = 'zc';
-		}
-		if (stripos($logName, '.log') === false) {
-			$logName .= '.log';
-		}
-		if ($logName[0] != '/' || $logName[1] != ':') {
-			$logName = rtrim(Zc::C('log.dir'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR  . $logName;
-		}
-		
-		$logPath = $logName . '.' . date('Y-m-d', time ());
-		$log = new ZcLog($logPath, $defaultLevel, $echo);
-		return $log;
+	public static function getLog($logName = '', $defaultLevel = ZcLog::INFO, $echo = false, $logHandler = ZcLog::LOG_HANDLER_DIR_FILE, $options = array()) {
+		return new ZcLog($logName, $defaultLevel, $echo, $logHandler, $options);
 	}
 	
 	/**
@@ -322,16 +425,17 @@ class Zc {
 	 * @param array $options
 	 * @return ZcAbstractCache
 	 */
-	public static function getCache($bizName, $cacheType = '',  $timestamp = '', $options = null) {
+	public static function getCache($bizName, $cacheType = '',  $timestamp = '', $options = null, $cacheClass = '') {
 		static $cacheInstances = array();
 		
 		$cacheInstanceKey = $bizName;
 		if (!isset($cacheInstances[$cacheInstanceKey])) {
-			if (empty($cacheType) || empty($options)) {
-				throw new Exception("try to create cache[{$bizName}], but cacheType[{$cacheType}], options[" . print_r($options, true) . "]");
+			if (!($cacheClass || $cacheType) || empty ($options)) {
+				throw new Exception ("try to create cache[{$bizName}], but cacheType[{$cacheType}], options[" . print_r ($options, true) . "]");
 			}
 			
-			$cacheClassName = 'ZcCache' . ucwords($cacheType);
+			$systemCacheClass = 'ZcCache' . ucwords($cacheType);
+			$cacheClassName = (empty($cacheClass)) ? $systemCacheClass : $cacheClass;
 			$cache = new $cacheClassName($timestamp, $options);
 			$cacheInstances[$cacheInstanceKey] = $cache;
 		}
@@ -351,7 +455,7 @@ class Zc {
 	
 	private static function cleanQuotes() {
 		$config = ZcFactory::getConfig();
-		if (!$config->get('clean.quotes')) {
+		if (!$config->get(ZcConfigConst::CleanQuotes)) {
 			return;
 		}
 		
@@ -367,11 +471,11 @@ class Zc {
 		}
 	}
 	
-	private static function initTimeZone() {
+	private static function initTimezone() {
 		$config = ZcFactory::getConfig();
-		$timeZone = $config->get('default.timezone');
-		if (!empty($timeZone)) {
-			date_default_timezone_set($timeZone);
+		$timezone = $config->get(ZcConfigConst::DefaultTimezone);
+		if (!empty($timezone)) {
+			date_default_timezone_set($timezone);
 		}
 	}
 	
@@ -407,7 +511,7 @@ class Zc {
 		$zcUrl->parse();
 		
 		if (empty($route)) {
-			$route = isset($_GET['route']) ? $_GET['route'] : Zc::C('default.route');
+			$route = isset($_GET['route']) ? $_GET['route'] : Zc::C(ZcConfigConst::DefaultRoute);
 		}
 		$action = new ZcAction($route);
 		$dispatcher = new ZcDispatcher();

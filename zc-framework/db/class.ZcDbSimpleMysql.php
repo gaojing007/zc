@@ -7,21 +7,30 @@
  */
 class ZcDbSimpleMysql {
 	private $connection;
-
+	
+	private $errorDisplay;
+	
 	public function __construct($hostname = '', $username = '', $password = '', $database = '') {
 		if (empty($hostname)) {
-			$hostname = Zc::C('db.hostname');
-			$username = Zc::C('db.username');
-			$password = Zc::C('db.password');
-			$database = Zc::C('db.database');
+			$hostname = Zc::C(ZcConfigConst::DbHostname);
+			$username = Zc::C(ZcConfigConst::DbUsername);
+			$password = Zc::C(ZcConfigConst::DbPassword);
+			$database = Zc::C(ZcConfigConst::DbDatabase);
 		}
+		$this->errorDisplay = Zc::C(ZcConfigConst::MonitorExitOnDbError) == true ? true : false;
 		
 		if (!$this->connection = mysql_connect($hostname, $username, $password, true)) {
-			exit('Error: Could not make a database connection using ' . $username . '@' . $hostname);
+			if($this->errorDisplay) {
+				exit('Error: Could not make a database connection using ' . $username . '@' . $hostname);
+			}
+			return false;
 		}
 
 		if (!mysql_select_db($database, $this->connection)) {
-			exit('Error: Could not connect to database ' . $database);
+			if($this->errorDisplay) {
+				exit('Error: Could not connect to database ' . $database);
+			}
+			return false;
 		}
 
 		mysql_query("SET NAMES 'utf8'", $this->connection);

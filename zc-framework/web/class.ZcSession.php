@@ -59,7 +59,7 @@ class ZcSession {
 			self::$log->monitor("$sessionType session start failed");
 		}
 		
-		self::$isStart = true;
+		self::$isStart = $ret;
 		
 		if (!isset($_SESSION['securityToken'])) {
 			$_SESSION['securityToken'] = md5(uniqid(rand(), true));

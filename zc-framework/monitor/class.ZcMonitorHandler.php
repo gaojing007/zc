@@ -37,7 +37,7 @@ class ZcMonitorHandler {
 		$errorContents .= "\r\n + - - - - - - - - - - - - - - - - SERVER INFOMATION - - - - - - - - - - - - - - - + \r\n";
 		$errorContents .= "\r\n" . print_r($_SERVER, true) . "\r\n";
 		$errorContents .= "\r\n + - - - - - - - - - - - - - - - - DEBUG BACKTRACE - - - - - - - - - - - - - - - - + \r\n";
-		$errorContents .= "\r\n". print_r(debug_backtrace(), true) . "\r\n";
+		//$errorContents .= "\r\n". print_r(debug_backtrace(), true) . "\r\n";
 		
 		$isNotify = $needNotify == true ? 0 : 1;
 		$gmtCreate = date('Y-m-d H:i:s', time());
@@ -56,7 +56,7 @@ class ZcMonitorHandler {
 		}
 		$config = ZcFactory::getConfig();
 		
-		$this->dbLink = new ZcDbSimpleMysql($config->get('monitor.db.server'), $config->get('monitor.db.username'), $config->get('monitor.db.password'), $config->get('monitor.db.database'));
+		$this->dbLink = new ZcDbSimpleMysql($config->get(ZcConfigConst::MonitorDbServer), $config->get(ZcConfigConst::MonitorDbUsername), $config->get(ZcConfigConst::MonitorDbPassword), $config->get(ZcConfigConst::MonitorDbDatabase));
 		
 		return $this->dbLink;
 	}

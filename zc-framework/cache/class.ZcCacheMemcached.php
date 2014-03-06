@@ -12,21 +12,22 @@ class ZcCacheMemcached extends ZcAbstractCache {
 	private $log;
 	
 	public function __construct($timestamp, $options = '') {
-		
 		if (!extension_loaded('memcache')) {
 			$this->conntected = false;
 			return;
 		}
 		
 		$this->log = Zc::getLog('cache/memcache_cache.log');
-		
+
 		$this->timestamp = $timestamp;
 
 		if (empty($options)) {
-			$this->options = array(
-					'host' =>  '127.0.0.1',
-					'port' => 11211,
-			);
+			$this->options = array (
+					array (
+							'host' => '127.0.0.1',
+							'port' => 11211 
+					) 
+				);
 		} else {
 			$this->options = $options;
 		}
