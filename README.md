@@ -1,4 +1,4 @@
-Zc
+Zc Framework
 ==
 
 A PHP MVC Framework
